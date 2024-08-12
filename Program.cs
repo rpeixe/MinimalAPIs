@@ -3,7 +3,7 @@ var app = builder.Build();
 
 app.MapGet("/", () => "Hello World!");
 
-app.MapPost("/login", (MinimalApis.DTOs.LoginDTO loginDTO) => {
+app.MapPost("/login", (MinimalAPIs.Dominio.DTOs.LoginDTO loginDTO) => {
     if(loginDTO.Email == "adm@teste.com" && loginDTO.Senha == "123456")
     {
         return Results.Ok("Login com sucesso");

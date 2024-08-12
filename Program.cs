@@ -1,8 +1,13 @@
-using MinimalAPIs.Infraestrutura.Dbs;
-using MinimalAPIs.Dominio.DTOs;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using MinimalAPIs.Dominio.DTOs;
+using MinimalAPIs.Dominio.Interfaces;
+using MinimalAPIs.Dominio.Servicos;
+using MinimalAPIs.Infraestrutura.Dbs;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddScoped<IAdministradorServico, AdministradorServico>();
 
 builder.Services.AddDbContext<DbContexto>(options => {
     options.UseSqlServer(builder.Configuration.GetConnectionString("sqlserver"));
@@ -12,8 +17,8 @@ var app = builder.Build();
 
 app.MapGet("/", () => "Hello World!");
 
-app.MapPost("/login", (LoginDTO loginDTO) => {
-    if(loginDTO.Email == "adm@teste.com" && loginDTO.Senha == "123456")
+app.MapPost("/login", ([FromBody] LoginDTO loginDTO, IAdministradorServico administradorServico) => {
+    if(administradorServico.Login(loginDTO) != null)
     {
         return Results.Ok("Login com sucesso");
     }

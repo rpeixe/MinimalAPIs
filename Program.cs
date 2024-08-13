@@ -83,6 +83,21 @@ app.MapPut("/veiculos/{id}", ([FromRoute] int id, [FromBody] VeiculoDTO veiculoD
     }
 }).WithTags("Veículos");
 
+app.MapDelete("/veiculos/{id}", ([FromRoute] int id, IVeiculoServico veiculoServico) => {
+    var veiculo = veiculoServico.BuscaPorId(id);
+
+    if(veiculo == null)
+    {
+        return Results.NotFound();
+    }
+    else
+    {
+        veiculoServico.Apagar(veiculo);
+
+        return Results.NoContent();
+    }
+}).WithTags("Veículos");
+
 app.UseSwagger();
 app.UseSwaggerUI();
 

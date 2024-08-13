@@ -21,7 +21,7 @@ var app = builder.Build();
 
 app.MapGet("/", () => Results.Json(new Home()));
 
-app.MapPost("/login", ([FromBody] LoginDTO loginDTO, IAdministradorServico administradorServico) => {
+app.MapPost("/administradores/login", ([FromBody] LoginDTO loginDTO, IAdministradorServico administradorServico) => {
     if(administradorServico.Login(loginDTO) != null)
     {
         return Results.Ok("Login com sucesso");

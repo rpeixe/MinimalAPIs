@@ -7,6 +7,7 @@ using MinimalAPIs.Dominio.ModelViews;
 using MinimalAPIs.Dominio.Servicos;
 using MinimalAPIs.Infraestrutura.Dbs;
 
+#region Builder
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddScoped<IAdministradorServico, AdministradorServico>();
@@ -20,9 +21,13 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
+#endregion
 
+#region Home
 app.MapGet("/", () => Results.Json(new Home())).WithTags("Home");
+#endregion
 
+#region Administradores
 app.MapPost("/administradores/login", ([FromBody] LoginDTO loginDTO, IAdministradorServico administradorServico) => {
     if(administradorServico.Login(loginDTO) != null)
     {
@@ -33,7 +38,9 @@ app.MapPost("/administradores/login", ([FromBody] LoginDTO loginDTO, IAdministra
         return Results.Unauthorized();
     }
 }).WithTags("Administradores");
+#endregion
 
+#region Veículos
 app.MapPost("/veiculos", ([FromBody] VeiculoDTO veiculoDTO, IVeiculoServico veiculoServico) => {
     var veiculo = new Veiculo {
         Nome = veiculoDTO.Nome,
@@ -97,8 +104,11 @@ app.MapDelete("/veiculos/{id}", ([FromRoute] int id, IVeiculoServico veiculoServ
         return Results.NoContent();
     }
 }).WithTags("Veículos");
+#endregion
 
+#region App
 app.UseSwagger();
 app.UseSwaggerUI();
 
 app.Run();
+#endregion

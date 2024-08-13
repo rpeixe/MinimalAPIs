@@ -41,7 +41,36 @@ app.MapPost("/administradores/login", ([FromBody] LoginDTO loginDTO, IAdministra
 #endregion
 
 #region Veículos
+ErrosDeValidacao validaDTO(VeiculoDTO veiculoDTO)
+{
+    var validacao = new ErrosDeValidacao {
+        Mensagens = new List<string>()
+    };
+
+    if (string.IsNullOrEmpty(veiculoDTO.Nome))
+    {
+        validacao.Mensagens.Add("O nome não pode ser vazio");
+    }
+    if (string.IsNullOrEmpty(veiculoDTO.Marca))
+    {
+        validacao.Mensagens.Add("A marca não pode ficar em branco");
+    }
+    if (veiculoDTO.Ano < 1900)
+    {
+        validacao.Mensagens.Add("O ano deve ser maior ou igual a 1900");
+    }
+
+    return validacao;
+}
+
 app.MapPost("/veiculos", ([FromBody] VeiculoDTO veiculoDTO, IVeiculoServico veiculoServico) => {
+    var validacao = validaDTO(veiculoDTO);
+
+    if (validacao.Mensagens.Count > 0)
+    {
+        return Results.BadRequest(validacao);
+    }
+
     var veiculo = new Veiculo {
         Nome = veiculoDTO.Nome,
         Marca = veiculoDTO.Marca,
@@ -65,10 +94,8 @@ app.MapGet("/veiculos/{id}", ([FromRoute] int id, IVeiculoServico veiculoServico
     {
         return Results.NotFound();
     }
-    else
-    {
-        return Results.Ok(veiculo);
-    }
+
+    return Results.Ok(veiculo);
 }).WithTags("Veículos");
 
 app.MapPut("/veiculos/{id}", ([FromRoute] int id, [FromBody] VeiculoDTO veiculoDTO, IVeiculoServico veiculoServico) => {
@@ -78,16 +105,21 @@ app.MapPut("/veiculos/{id}", ([FromRoute] int id, [FromBody] VeiculoDTO veiculoD
     {
         return Results.NotFound();
     }
-    else
+
+    var validacao = validaDTO(veiculoDTO);
+
+    if (validacao.Mensagens.Count > 0)
     {
-        veiculo.Nome = veiculoDTO.Nome;
-        veiculo.Marca = veiculoDTO.Marca;
-        veiculo.Ano = veiculoDTO.Ano;
-
-        veiculoServico.Atualizar(veiculo);
-
-        return Results.Ok(veiculo);
+        return Results.BadRequest(validacao);
     }
+
+    veiculo.Nome = veiculoDTO.Nome;
+    veiculo.Marca = veiculoDTO.Marca;
+    veiculo.Ano = veiculoDTO.Ano;
+
+    veiculoServico.Atualizar(veiculo);
+
+    return Results.Ok(veiculo);
 }).WithTags("Veículos");
 
 app.MapDelete("/veiculos/{id}", ([FromRoute] int id, IVeiculoServico veiculoServico) => {
@@ -97,12 +129,10 @@ app.MapDelete("/veiculos/{id}", ([FromRoute] int id, IVeiculoServico veiculoServ
     {
         return Results.NotFound();
     }
-    else
-    {
-        veiculoServico.Apagar(veiculo);
 
-        return Results.NoContent();
-    }
+    veiculoServico.Apagar(veiculo);
+
+    return Results.NoContent();
 }).WithTags("Veículos");
 #endregion
 

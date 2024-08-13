@@ -69,7 +69,11 @@ app.MapPost("/administradores", ([FromBody] AdministradorDTO administradorDTO, I
     };
     administradorServico.Incluir(administrador);
 
-    return Results.Created($"administradores/{administrador.Id}", administrador);
+    return Results.Created($"administradores/{administrador.Id}", new AdministradorModelView {
+        Id = administrador.Id,
+        Email = administrador.Email,
+        Perfil = administrador.Perfil
+    });
 }).WithTags("Administradores");
 
 app.MapGet("/administradores", ([FromQuery] int? pagina, IAdministradorServico administradorServico) => {

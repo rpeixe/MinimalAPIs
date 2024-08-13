@@ -91,7 +91,11 @@ app.MapGet("/administradores/{id}", ([FromRoute] int id, IAdministradorServico a
         return Results.NotFound();
     }
 
-    return Results.Ok(administrador);
+    return Results.Ok(new AdministradorModelView {
+        Id = administrador.Id,
+        Email = administrador.Email,
+        Perfil = administrador.Perfil
+    });
 }).WithTags("Administradores");
 #endregion
 

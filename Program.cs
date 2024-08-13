@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MinimalAPIs.Dominio.DTOs;
 using MinimalAPIs.Dominio.Interfaces;
+using MinimalAPIs.Dominio.ModelViews;
 using MinimalAPIs.Dominio.Servicos;
 using MinimalAPIs.Infraestrutura.Dbs;
 
@@ -18,7 +19,7 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-app.MapGet("/", () => "Hello World!");
+app.MapGet("/", () => Results.Json(new Home()));
 
 app.MapPost("/login", ([FromBody] LoginDTO loginDTO, IAdministradorServico administradorServico) => {
     if(administradorServico.Login(loginDTO) != null)

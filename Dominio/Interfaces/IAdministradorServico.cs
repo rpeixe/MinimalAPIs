@@ -9,4 +9,6 @@ public interface IAdministradorServico
     void Incluir(Administrador administrador);
     Administrador? BuscaPorId(int id);
     List<Administrador> Todos(int? pagina);
+    void Atualizar(Administrador administrador);
+    void Apagar(Administrador administrador);
 }

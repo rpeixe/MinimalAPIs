@@ -177,6 +177,61 @@ app.MapGet("/administradores/{id}", ([FromRoute] int id, IAdministradorServico a
         Perfil = administrador.Perfil
     });
 }).RequireAuthorization(new AuthorizeAttribute { Roles = "Adm" }).WithTags("Administradores");
+
+app.MapPut("/administradores/{id}", ([FromRoute] int id, [FromBody] AdministradorDTO administradorDTO, IAdministradorServico administradorServico) => {
+    var administrador = administradorServico.BuscaPorId(id);
+
+    if(administrador == null)
+    {
+        return Results.NotFound();
+    }
+
+    var validacao = new ErrosDeValidacao {
+        Mensagens = new List<string>()
+    };
+    if (string.IsNullOrEmpty(administradorDTO.Email))
+    {
+        validacao.Mensagens.Add("O email não pode ser vazio");
+    }
+    if (string.IsNullOrEmpty(administradorDTO.Senha))
+    {
+        validacao.Mensagens.Add("A senha não pode ser vazio");
+    }
+    if (administradorDTO.Perfil == null)
+    {
+        validacao.Mensagens.Add("O perfil não pode ser vazio");
+    }
+
+    if (validacao.Mensagens.Count > 0)
+    {
+        return Results.BadRequest(validacao);
+    }
+
+    administrador.Email = administradorDTO.Email;
+    administrador.Senha = administradorDTO.Senha;
+    administrador.Perfil = administradorDTO.Perfil.ToString() ?? Perfil.Editor.ToString();
+
+    administradorServico.Atualizar(administrador);
+
+    return Results.Ok(new AdministradorModelView {
+        Id = administrador.Id,
+        Email = administrador.Email,
+        Perfil = administrador.Perfil
+    });
+}).RequireAuthorization(new AuthorizeAttribute { Roles = "Adm" }).WithTags("Administradores");
+
+app.MapDelete("/administradores/{id}", ([FromRoute] int id, IAdministradorServico administradorServico) => {
+    var administrador = administradorServico.BuscaPorId(id);
+
+    if(administrador == null)
+    {
+        return Results.NotFound();
+    }
+
+    administradorServico.Apagar(administrador);
+
+    return Results.NoContent();
+}).RequireAuthorization(new AuthorizeAttribute { Roles = "Adm" }).WithTags("Administradores");
 #endregion
 
 #region Veículos
